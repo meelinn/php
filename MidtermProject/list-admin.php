@@ -474,25 +474,11 @@ function fetchShelter($pdo, $shelter_id)
     });
   });
 
-
-  // function validateEmail(email) {
-  //   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  //   return re.test(email);
-  // }
-
-  // function validateMobile(mobile) {
-  //   const re = /^09\d{2}-?\d{3}-?\d{3}$/ //檢查字串
-  //   return re.test(mobile);
-  // }
-
-  // function validatePhoto(photo) {
-  //   const re = /^09\d{2}-?\d{3}-?\d{3}$/; //檢查字串
-  //   return re.test(photo);
-  // }
+  const isEditMode = true;
 
   function sendData(event) {
-    event.preventDefault(); //不要讓表單以傳統方式送出
-    // 檢查表單
+    event.preventDefault(); // 不要讓表單以傳統方式送出
+
     const {
       photo: photoEl,
       name: nameEl,
@@ -504,404 +490,77 @@ function fetchShelter($pdo, $shelter_id)
       qualities: qualitiesEl,
       narrative: narrativeEl,
       behavior: behaviorEl,
-      // degree: degreeEl,
       state: stateEl,
       medical: medicalEl,
       story: storyEl
-    } = document.form1; //以解構的方式拿資料El=Element
-    //物件document.form1的屬性設定在{}裡面
-    //  check: checkEl
-    const fields = [photoEl, nameEl, shelterEl, typeEl, genderEl, colorEl, ageEl, qualitiesEl, narrativeEl, behaviorEl, stateEl, medicalEl, storyEl]; //抓每個欄位成陣列,下面回復欄位迴圈需用到
-    // degreeEl,checkEl
+    } = document.form1;
 
-    // 圖片上傳
-    // const avatar = document.uploadForm.avatar;
-    // avatar.onchange = (event) => {
-    //   const fd = new FormData(document.uploadForm);
-    //   alert('change avatar')
-    //   fetch("upload-avatar-api.php", {
-    //       method: "POST",
-    //       body: fd,
-    //     })
-    //     .then((r) => r.json())
-    //     .then((result) => {
-    //       if (result.success) {
-    //         // result.filename
-    //         image_path.value = result.filename;
-    //         myimg.src = `./imgs/${result.filename}`;
-    //       }
-
-    //     })
-    //     .catch((ex) => console.log(ex));
-    // };
-
-    //回復欄位的外觀
-    /*   nameEl.style.border = '1px solid #CCC';
-    nameEl.nextElementSibling.innerHTML = '';
-    emailEl.style.border = '1px solid #CCC';
-    emailEl.nextElementSibling.innerHTML = '';
-    mobilEl.style.border = '1px solid #CCC';
-    mobilEl.nextElementSibling.innerHTML = '';  
-    改寫成迴圈:*/
+    const fields = [photoEl, nameEl, shelterEl, typeEl, genderEl, colorEl, ageEl, qualitiesEl, narrativeEl, behaviorEl, stateEl, medicalEl, storyEl];
 
     for (let el of fields) {
       el.style.border = '1px solid #CCC';
       el.nextElementSibling.innerHTML = '';
     }
 
-    let isPass = true; //整個表單有沒有通過檢查
+    let isPass = true; // 整個表單有沒有通過檢查
 
-    //TODO:檢查表單個欄位有沒有符合規範
-    // if (checkEl.value.length < 1) {
-    //   isPass = false; //名字字元<1=不通過
-    //   /*alert('請填寫正確姓名');
-    //   return;*/
-    //   checkEl.style.border = '1px solid red';
-    //   checkEl.nextElementSibling.innerHTML = '請輸入檢查時間';
-    // }
+    // TODO: 檢查表單個欄位有沒有符合規範
+    const checkField = (el, errorMsg) => {
+      if (el.value.trim() === '') {
+        isPass = false;
+        el.style.border = '1px solid red';
+        if (el.nextElementSibling) { // 檢查下一個兄弟元素是否存在
+          el.nextElementSibling.innerHTML = errorMsg;
+        }
+      }
+    };
 
-    if (photoEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      photoEl.style.border = '1px solid red';
-      photoEl.nextElementSibling.innerHTML = '請上傳圖片';
-    }
+    checkField(photoEl, '請上傳圖片');
+    checkField(nameEl, '請輸入名字');
+    checkField(shelterEl, '請選擇收容所');
+    checkField(typeEl, '請選擇種類');
+    checkField(colorEl, '請選擇花色');
+    checkField(genderEl, '請選擇性別');
+    checkField(ageEl, '請輸入年齡');
+    checkField(qualitiesEl, '請輸入個性特質');
+    checkField(narrativeEl, '請輸入外表與個性簡述');
+    checkField(stateEl, '請輸入外表與個性簡述');
+    checkField(behaviorEl, '請選擇行為');
+    checkField(medicalEl, '請輸入醫療史');
+    checkField(storyEl, '請輸入背景故事');
 
-    if (nameEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      nameEl.style.border = '1px solid red';
-      nameEl.nextElementSibling.innerHTML = '請輸入名字';
-    }
-
-    if (shelterEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      shelterEl.style.border = '1px solid red';
-      shelterEl.nextElementSibling.innerHTML = '請選擇收容所';
-    }
-
-    if (typeEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      typeEl.style.border = '1px solid red';
-      typeEl.nextElementSibling.innerHTML = '請選擇種類';
-    }
-
-    if (colorEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      colorEl.style.border = '1px solid red';
-      colorEl.nextElementSibling.innerHTML = '請選擇花色';
-    }
-
-    if (genderEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      genderEl.style.border = '1px solid red';
-      genderEl.nextElementSibling.innerHTML = '請選擇性別';
-    }
-
-    if (ageEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      ageEl.style.border = '1px solid red';
-      ageEl.nextElementSibling.innerHTML = '請輸入年齡';
-    }
-
-    if (qualitiesEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-
-      qualitiesEl.style.border = '1px solid red';
-      qualitiesEl.nextElementSibling.innerHTML = '請輸入個性特質';
-    }
-
-    if (narrativeEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-
-      narrativeEl.style.border = '1px solid red';
-      narrativeEl.nextElementSibling.innerHTML = '請輸入外表與個性簡述';
-    }
-
-    if (stateEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-
-      stateEl.style.border = '1px solid red';
-      stateEl.nextElementSibling.innerHTML = '請輸入外表與個性簡述';
-    }
-
-    if (behaviorEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-
-      behaviorEl.style.border = '1px solid red';
-      behaviorEl.nextElementSibling.innerHTML = '請選擇行為';
-    }
-
-    // if (degreeEl.value.length < 1) {
-    //   isPass = false;
-    //   degreeEl.style.border = '1px solid red';
-    //   degreeEl.nextElementSibling.innerHTML = '請選擇程度';
-    // }
-
-    if (medicalEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      medicalEl.style.border = '1px solid red';
-      medicalEl.nextElementSibling.innerHTML = '請輸入醫療史';
-    }
-
-    if (storyEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      storyEl.style.border = '1px solid red';
-      storyEl.nextElementSibling.innerHTML = '請輸入背景故事';
-    }
-
-
-    // if (emailEl.value && !validateEmail(emailEl.value)) {
-    //   isPass = false;
-    //   emailEl.style.border = '1px solid #red';
-    //   emailEl.nextElementSibling.innerHTML = '請填寫正確的Email';
-    // }
-
-    // if (mobileEl.value && !validateMobile(mobileEl.value)) {
-    //   isPass = false;
-    //   mobileEl.style.border = '1px solid #red';
-    //   mobileEl.nextElementSibling.innerHTML = '請填寫正確的手機號碼';
-    // }
-
-    if (isPass) { //if(isPass){}通過才送出表單
+    if (isPass) {
       const fd = new FormData(document.form1);
-      //把表單內容複製到沒有外觀的表單物件(有外觀=上面form標籤,有外觀才能讓使用者輸入資料)fd變數名稱=formdata , new+類型(FormData)}
+      const apiUrl = isEditMode ? 'edit-api.php' : 'add-api.php';
 
-      //fetch(送到哪裡,用甚麼方式)
-      fetch(`add-api.php`, { //TypeScript
+      fetch(apiUrl, {
         method: 'POST',
         body: fd
       }).then(r => r.json()).then(data => {
         console.log(data);
+
         if (data.success) {
-          /* 更改為BOOTSTRAP的彈窗
-         alert('資料新增成功');
-          location.href = 'list.php';
+          if (isEditMode) {
+            successModal_edit.show();
+          } else {
+            successModal.show();
+          }
         } else {
-          alert('資料新增失敗\n' + data.error);*/
-          successModal.show();
-        } else {
-          document.querySelector('#failureInfo').innerHTML = data.error;
-          failureModal.show();
+          if (isEditMode) {
+            if (document.querySelector('#failureModal_edit')) {
+              document.querySelector('#failureModal_edit').innerHTML = data.error;
+              failureModal_edit.show();
+            }
+          } else {
+            if (document.querySelector('#failureInfo')) {
+              document.querySelector('#failureInfo').innerHTML = data.error;
+              failureModal.show();
+            }
+          }
         }
-
-      }) //data => {}輸出到add-api-output
+      });
     }
   }
-
-  const successModal = new bootstrap.Modal(document.getElementById('successModal'), Option);
-  const failureModal = new bootstrap.Modal(document.getElementById('failureModal'), Option);
-</script>
-<script>
-  function backToList() {
-    if (document.referrer) {
-      location.href = document.referrer;
-    } else {
-      location.href = "list.php";
-    }
-  }
-
-  const {
-    photo: photoEl,
-    name: nameEl,
-    shelter: shelterEl,
-    type: typeEl,
-    gender: genderEl,
-    color: colorEl,
-    age: ageEl,
-    qualities: qualitiesEl,
-    narrative: narrativeEl,
-    behavior: behaviorEl,
-    // degree: degreeEl,
-    state: stateEl,
-    medical: medicalEl,
-    story: storyEl
-  } = document.form1 //以解構的方式拿資料El=Element
-  //物件document.form1的屬性設定在{}裡面
-
-  const fields = [nameEl, emailEl, mobileEl]; //抓每個欄位成陣列,下面回復欄位迴圈需用到
-
-  function validateEmail(email) {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-  }
-
-  function validateMobile(mobile) {
-    const re = /^09\d{2}-?\d{3}-?\d{3}$/ //檢查字串
-    return re.test(mobile);
-  }
-
-  function sendData(e) {
-    //回復欄位的外觀
-    /*   nameEl.style.border = '1px solid #CCC';
-    nameEl.nextElementSibling.innerHTML = '';
-    emailEl.style.border = '1px solid #CCC';
-    emailEl.nextElementSibling.innerHTML = '';
-    mobilEl.style.border = '1px solid #CCC';
-    mobilEl.nextElementSibling.innerHTML = '';  
-    改寫成迴圈:*/
-
-    for (let el of fields) {
-      el.style.border = '1px solid #CCC';
-      el.nextElementSibling.innerHTML = '';
-    }
-
-    e.preventDefault(); //不要讓表單以傳統方式送出
-
-    let isPass = true; //整個表單有沒有通過檢查
-    //return; //讓以上沒有功能
-
-    //TODO:檢查表單個欄位有沒有符合規範
-    if (photoEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      photoEl.style.border = '1px solid red';
-      photoEl.nextElementSibling.innerHTML = '請上傳圖片';
-    }
-
-    if (nameEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      nameEl.style.border = '1px solid red';
-      nameEl.nextElementSibling.innerHTML = '請輸入名字';
-    }
-
-    if (shelterEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      shelterEl.style.border = '1px solid red';
-      shelterEl.nextElementSibling.innerHTML = '請選擇收容所';
-    }
-
-    if (typeEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      typeEl.style.border = '1px solid red';
-      typeEl.nextElementSibling.innerHTML = '請選擇種類';
-    }
-
-    if (colorEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      colorEl.style.border = '1px solid red';
-      colorEl.nextElementSibling.innerHTML = '請選擇花色';
-    }
-
-    if (genderEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      genderEl.style.border = '1px solid red';
-      genderEl.nextElementSibling.innerHTML = '請選擇性別';
-    }
-
-    if (ageEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      ageEl.style.border = '1px solid red';
-      ageEl.nextElementSibling.innerHTML = '請輸入年齡';
-    }
-
-    if (qualitiesEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-
-      qualitiesEl.style.border = '1px solid red';
-      qualitiesEl.nextElementSibling.innerHTML = '請輸入個性特質';
-    }
-
-    if (narrativeEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-
-      narrativeEl.style.border = '1px solid red';
-      narrativeEl.nextElementSibling.innerHTML = '請輸入外表與個性簡述';
-    }
-
-    if (stateEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-
-      stateEl.style.border = '1px solid red';
-      stateEl.nextElementSibling.innerHTML = '請輸入外表與個性簡述';
-    }
-
-    if (behaviorEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-
-      behaviorEl.style.border = '1px solid red';
-      behaviorEl.nextElementSibling.innerHTML = '請選擇行為';
-    }
-
-    // if (degreeEl.value.length < 1) {
-    //   isPass = false;
-    //   degreeEl.style.border = '1px solid red';
-    //   degreeEl.nextElementSibling.innerHTML = '請選擇程度';
-    // }
-
-    if (medicalEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      medicalEl.style.border = '1px solid red';
-      medicalEl.nextElementSibling.innerHTML = '請輸入醫療史';
-    }
-
-    if (storyEl.value.length < 1) {
-      isPass = false; //名字字元<1=不通過
-      /*alert('請填寫正確姓名');
-      return;*/
-      storyEl.style.border = '1px solid red';
-      storyEl.nextElementSibling.innerHTML = '請輸入背景故事';
-    }
-
-    if (isPass) { //if(isPass){}通過才送出表單
-      const fd = new FormData(document.form1);
-      //把表單內容複製到沒有外觀的表單物件(有外觀=上面form標籤,有外觀才能讓使用者輸入資料)fd變數名稱=formdata , new+類型(FormData)}
-
-      //fetch(送到哪裡,用甚麼方式)
-      fetch(`edit-api.php`, { //TypeScript
-        method: 'POST',
-        body: fd
-      }).then(r => r.json()).then(data => {
-        console.log(data);
-        if (data.success) {
-          /* 更改為BOOTSTRAP的彈窗
-         alert('資料修改成功');
-          location.href = 'list.php';
-        } else {
-          alert('資料修改失敗\n' + data.error);*/
-          successModal_edit.show();
-        } else {
-          document.querySelector('#failureModal_edit').innerHTML = data.error;
-          failureModal_edit.show();
-        }
-
-      }) //data => {}輸出到add-api-output
-    }
-  }
-
-  const successModal_edit = new bootstrap.Modal(document.getElementById('successModal_edit'), Option);
-  const failureModal_edit = new bootstrap.Modal(document.getElementById('failureModal_edit'), Option);
 </script>
 <?php include __DIR__ . '/parts/html-foot.php'
 ?>

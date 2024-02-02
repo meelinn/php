@@ -52,11 +52,13 @@ if (!empty($_POST && !empty($_POST['sid']))) //檢查欄位是不是空的=長�
 
 
   //UPDATE語法
-  $sql = "UPDATE `animal_info` SET `animal_id`='?',`animal_name`=?,`fk_animal_type_id`=?,`animal_age`=?,`fk_animal_gender_id`=?,`animal_birthday`=?,`fk_animal_color`=?,`fk_animal_photo_id`=?,`fk_shelter_id`=?,`animal_story`=?,`animal_qualities`=?,`animal_simple_narrative`=?',`fk_animal_state_id`=?,`fk_animal_medical_record_id`=?,`fk_animal_behavior_id`=? `animal_id`=?"; //edit的上方的隱藏欄位
+  $sql = "UPDATE `animal_info` SET `animal_id`='?', `animal_name`=?, `fk_animal_type_id`=?, `animal_age`=?, `fk_animal_gender_id`=?, `animal_birthday`=?, `fk_animal_color`=?, `fk_animal_photo_id`=?, `fk_shelter_id`=?, `animal_story`=?, `animal_qualities`=?, `animal_simple_narrative`=?, `fk_animal_state_id`=?, `fk_animal_medical_record_id`=?, `fk_animal_behavior_id`=? 
+  WHERE `animal_id`=?"; //edit的上方的隱藏欄位
 
 
   $stmt = $pdo->prepare($sql);
-  $stmt->execute([ //會做SQL的跳脫,所以不用+''//先prepare再execute,是一組的,可避免攻擊
+
+  if ($stmt->execute([ //會做SQL的跳脫,所以不用+''//先prepare再execute,是一組的,可避免攻擊
     $_POST['name'],
     $_POST['type'],
     $_POST['age'],
@@ -71,27 +73,33 @@ if (!empty($_POST && !empty($_POST['sid']))) //檢查欄位是不是空的=長�
     $_POST['state'],
     $_POST['medical'],
     $_POST['behavior']
-  ]);
+  ]))
 
-  /*原本的VALUES 
+
+
+    /*原本的VALUES 
     ('%s','%s','%s','%s','%s', NOW())"有可能被攻擊
     須改寫成$pdo->query($_POST['name']),
     */
 
-  //%s第一格name={$_POST.name}//NOW()取得當下時間
+    //%s第一格name={$_POST.name}//NOW()取得當下時間
 
-  //PDOStatement
-  //$stmt = $pdo->query($sql);
-  $output['code'] = 200;
+    //PDOStatement
+    //$stmt = $pdo->query($sql);
+    $output['code'] = 200;
   $output['success'] = boolval($stmt->rowCount()); //取得資料筆數//資料沒有修改會拿到0,有修才會拿到1
-}
 
-$backTo = 'list.php';
-//HTTP_REFERER=網頁檢查>network>header>REFERER
-if (!empty($_SERVER['HTTP_REFERER'])) {
-  $backTo = $_SERVER['HTTP_REFERER'];
+  $backTo = 'list.php';
+  //HTTP_REFERER=網頁檢查>network>header>REFERER
+  if (!empty($_SERVER['HTTP_REFERER'])) {
+    $backTo = $_SERVER['HTTP_REFERER'];
+  }
+} else {
+  // 執行失敗，取得錯誤訊息
+  $output['error'] = '資料修改失敗';
+  $output['code'] = 300;
+  $output['debug'] = $stmt->errorInfo(); // 加入錯誤訊息供除錯
 }
-
 header('Content-Type: application/json' . $backTo); #header檔頭標準格式
 echo json_encode($output, JSON_UNESCAPED_UNICODE);#JSON_UNESCAPED_UNICODE字串不跳脫
 #不做畫面呈現,純功能
