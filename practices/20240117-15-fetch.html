@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <pre></pre>
+
+  <script>
+    fetch(`20240117-14-connect-db.php`)
+      .then(r => r.json()) //等資料回來(狀態碼),r.json()=回來做jsonpass
+      .then((data) => { //等資料拿出來,要設定什麼格式,text=文字格式
+        console.log(data);
+        document.querySelector('pre').innerHTML = JSON.stringify(data, null, 4);
+      })
+      .catch((ex) => console.log(ex));
+
+  </script>
+</body>
+
+</html>

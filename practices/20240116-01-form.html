@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>20240115-11-query_string_plus_form
+  </title>
+</head>
+<style>
+  input {
+    display: block;
+    width: 150px;
+  }
+</style>
+
+<body>
+  <!-- action的php為GET動作,所以設定post抓不到值=0 -->
+  <form name="form1" method="get" onsubmit="submitHandler(event)">
+    <!-- =return false =event.preventDefault() 不送出表單 -->
+    <input type="number" name="a">
+    <input type="number" name="b">
+    <input type="submit" name="" id="">
+  </form>
+
+  <script>
+    function submitHandler(e) {
+      // e=形式參數
+      e.preventDefault();
+      const a = document.form1.a.value;
+      const b = document.form1.b.value;
+      console.log({ a, b });
+    }
+
+    //寫在後面會覆蓋行內設定的事件處理器
+    /*document.form1.onsubmit = function (event) {
+      //傳到別的地方要event
+      console.log("hello");
+      return false;
+    }*/
+  </script>
+</body>
+
+</html>

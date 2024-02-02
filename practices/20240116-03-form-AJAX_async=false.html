@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>20240115-11-query_string_plus_form
+  </title>
+</head>
+<style>
+  input {
+    /* display: block; */
+    width: 150px;
+  }
+</style>
+
+<body>
+  <!-- action的php為GET動作,所以設定post抓不到值=0 -->
+  <form action="" name="form1" method="get" onsubmit="submitHandler(event)">
+    <!-- =return false =event.preventDefault() 不送出表單 -->
+    <input type="number" name="a">
+    +
+    <input type="number" name="b">
+    <button>=</button>
+    <span id="result"></span>
+  </form>
+
+
+  <script>
+
+    const result = document.querySelector('#result'); //因為常被呼叫所以放在外面比較有效率
+
+    function submitHandler(e) {
+      e.preventDefault();
+      const a = document.form1.a.value;
+      const b = document.form1.b.value;
+
+      console.log({ a, b });
+
+      // 1. 建立 XMLHttpRequest 類型的物件
+      const xhr = new XMLHttpRequest();
+
+      /*// 2. 設定事件處理器
+      xhr.onload = (event) => {
+        result.innerHTML = xhr.responseText;
+        // xhr.responseText 為取得的文字資料
+        console.log('A,非同步,順序3,步驟4之後才回傳執行2');
+      };*/
+
+      // 3. 發送的 "設定" , open(方法,對象,使用同步) ,第三個參數async使用同步=非同步狀態=ture ,改為同步=false ,若為同步狀態則不須2事件處理器
+      xhr.open('GET', `20240115-10-query_string_plus.php?a=${a}&b=${b}`, false);
+      console.log('B,非同步,順序1');
+
+      // 4. 發送
+      xhr.send();
+      console.log('C,非同步,順序2');
+      result.innerHTML = xhr.responseText; //同步狀態清除2,但仍要顯示數字
+
+
+    }
+  </script>
+</body>
+
+</html>

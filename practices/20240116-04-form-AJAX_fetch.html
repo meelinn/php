@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>20240115-11-query_string_plus_form
+  </title>
+</head>
+<style>
+  input {
+    /* display: block; */
+    width: 150px;
+  }
+</style>
+
+<body>
+  <!-- action的php為GET動作,所以設定post抓不到值=0 -->
+  <form action="" name="form1" method="get" onsubmit="submitHandler(event)">
+    <!-- =return false =event.preventDefault() 不送出表單 -->
+    <input type="number" name="a">
+    +
+    <input type="number" name="b">
+    <button>=</button>
+    <span id="result"></span>
+  </form>
+
+
+  <script>
+
+
+    const result = document.querySelector('#result'); //因為常被呼叫所以放在外面比較有效率
+
+    function submitHandler(e) {
+      e.preventDefault();
+      const a = document.form1.a.value;
+      const b = document.form1.b.value;
+
+      console.log({ a, b });
+
+      /* //fetch ().then().then(一定要第二個then才會拿到結果)
+       fetch(`20240115-10-query_string_plus.php?a=${a}&b=${b}`).then(response => {
+         //拿到response類型的物件
+         console.log(response.headers);
+         console.log(response.status);
+         return response.text();
+       }).then(
+         //callback function
+         (result) => {
+           console.log({ result });
+         })
+         .catch(ex => console.log(ex));*/
+
+
+      // 使用`fetch`函式發送HTTP GET請求
+      fetch(`20240115-10-query_string_plus.php?a=${a}&b=${b}`).then(r =>
+        // 此處response=形式參數,可簡寫
+        // 處理伺服器回傳的response，將其視為文字資料
+        r.text()).then((txt) => {
+          // 將伺服器回傳的文字資料輸出到控制台
+          console.log({ txt });
+          // 將文字資料插入到HTML元素中
+          result.innerHTML = txt;
+        })
+        // 捕捉任何錯誤，並輸出到控制台, ex=Exception,形式參數
+        .catch((ex) => console.log(ex));
+    }
+  </script>
+</body>
+
+</html>
