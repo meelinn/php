@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <form method="post" action="dump-files.php" enctype="multipart/form-data">
+    <label for="file">上傳檔案</label>
+    <input type="file" name="photos[]" accept="image/*" multiple> <!-- accept="image/* = 只能上傳圖片(*=所有=所有圖片格式)  -->
+    <input type="submit">
+  </form>
+
+</body>
+
+</html>

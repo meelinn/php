@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+<style>
+  .card-container {
+    display: flex;
+  }
+
+  .my-card {
+    width: 300px;
+  }
+
+  .my-card img {
+    width: 100%;
+  }
+</style>
+
+<body>
+  <!-- form的id=photos,有設定photos.click,就會設定給form -->
+  <div style="cursor: pointer" onclick="photos.click()">點選上傳多張圖片</div>
+
+  <form name="form1" hidden>
+    <input type="file" id="photos" name="photos[]" multiple accept="image/*" onchange="uploadFile()" />
+  </form>
+
+  <div class="card-container">
+    <!--
+      <div class="my-card">
+        <img
+          src="./../uploads/001dc100ba86083a6a603b3bd90587577d22de1a.jpg"
+          alt=""
+        />
+      </div>
+-->
+  </div>
+  <script>
+    const container = document.querySelector(".card-container");
+
+    function uploadFile() {
+      const fd = new FormData(document.form1);
+
+      fetch("upload-photos-api.php", {
+        method: "POST",
+        body: fd, // enctype="multipart/form-data"
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          console.log({ data });
+          if (data.success && data.files.length) {
+            let str = "";
+            for (let i of data.files) {
+              str += `
+                <div class="my-card">
+                  <img
+                    src="./../imgs/${i}"
+                    alt=""
+                  />
+                </div>
+                `;
+            }
+            container.innerHTML = str;
+          }
+        });
+    }
+  </script>
+</body>
+
+</html>
