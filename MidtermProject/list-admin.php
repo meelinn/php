@@ -83,7 +83,6 @@ $rows = $pdo->query($sql)->fetchAll();
 ?>
 <!-- 主要內容開始 -->
 <div class="container-fluid">
-
   <h2>浪浪資訊列表</h2>
   <div class="container">
     <div class="  d-flex w-100 justify-content-between">
@@ -263,6 +262,7 @@ $rows = $pdo->query($sql)->fetchAll();
 </div>
 
 <!-- Modal-成功 -->
+<!-- 新增成功 -->
 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -282,13 +282,54 @@ $rows = $pdo->query($sql)->fetchAll();
     </div>
   </div>
 </div>
-
+<!-- 編輯成功 -->
+<div class="modal fade" id="successModal_edit" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ModalLabel">新增結果</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-success" role="alert">
+          資料新增成功
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+        <a href="list.php" class="btn btn-primary">回到列表頁</a>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal-失敗 -->
+<!-- 新增失敗 -->
 <div class="modal fade" id="failureModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="ModalLabel">資料新增成功</h5>
+        <h5 class="modal-title" id="ModalLabel">資料新增失敗</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div role="alert" id="failureInfo">
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+        <a href="list.php" class="btn btn-primary">跳至列表頁</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 編輯失敗 -->
+<div class="modal fade" id="failureModal_edit" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ModalLabel">資料編輯失敗</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -498,15 +539,20 @@ function fetchShelter($pdo, $shelter_id)
     const fields = [photoEl, nameEl, shelterEl, typeEl, genderEl, colorEl, ageEl, qualitiesEl, narrativeEl, behaviorEl, stateEl, medicalEl, storyEl];
 
     for (let el of fields) {
-      el.style.border = '1px solid #CCC';
-      el.nextElementSibling.innerHTML = '';
+      if (el) {
+        el.style.border = '1px solid #CCC';
+        if (el.nextElementSibling) {
+          el.nextElementSibling.innerHTML = '';
+        }
+      }
     }
 
     let isPass = true; // 整個表單有沒有通過檢查
 
     // TODO: 檢查表單個欄位有沒有符合規範
+
     const checkField = (el, errorMsg) => {
-      if (el.value.trim() === '') {
+      if (el.value && el.value.trim() === '') {
         isPass = false;
         el.style.border = '1px solid red';
         if (el.nextElementSibling) { // 檢查下一個兄弟元素是否存在
@@ -531,7 +577,15 @@ function fetchShelter($pdo, $shelter_id)
 
     if (isPass) {
       const fd = new FormData(document.form1);
-      const apiUrl = isEditMode ? 'edit-api.php' : 'add-api.php';
+      let apiUrl = ''; // 初始化 API URL
+
+      if (isEditMode) {
+        // 如果是編輯模式，使用編輯 API
+        apiUrl = 'edit-api.php';
+      } else {
+        // 如果是新增模式，使用新增 API
+        apiUrl = 'add-api.php';
+      }
 
       fetch(apiUrl, {
         method: 'POST',
@@ -541,26 +595,29 @@ function fetchShelter($pdo, $shelter_id)
 
         if (data.success) {
           if (isEditMode) {
-            successModal_edit.show();
-          } else {
-            successModal.show();
-          }
-        } else {
-          if (isEditMode) {
-            if (document.querySelector('#failureModal_edit')) {
-              document.querySelector('#failureModal_edit').innerHTML = data.error;
-              failureModal_edit.show();
+            if (document.querySelector('#successModal_edit')) {
+              document.querySelector('#successModal_edit').innerHTML = data.success;
+              successModal_edit.show();
+            } else {
+              console.error('Success modal for edit not found!');
             }
           } else {
-            if (document.querySelector('#failureInfo')) {
-              document.querySelector('#failureInfo').innerHTML = data.error;
-              failureModal.show();
+            if (document.querySelector('#successModal')) {
+              document.querySelector('#successModal').innerHTML = data.success;
+              successModal.show();
+            } else {
+              console.error('Success modal for add not found!');
             }
           }
         }
       });
     }
-  }
+  };
+
+  const successModal = new bootstrap.Modal('#successModal');
+  const failureModal = new bootstrap.Modal('#failureModal');
+  const successModal_edit = new bootstrap.Modal('#successModal_edit');
+  const failureModal_edit = new bootstrap.Modal('#failureModal_edit');
 </script>
 <?php include __DIR__ . '/parts/html-foot.php'
 ?>
