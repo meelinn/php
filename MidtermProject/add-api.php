@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/parts/pdo-connect.php';
 $output = [
-  'success' => false, #資料傳輸過來有沒有新增成功
+  'success' => true, #資料傳輸過來有沒有新增成功
   'postData' => $_POST,
   'error' => '',
   'code' => 0, #追蹤程式執行的編號
@@ -15,7 +15,7 @@ if (!empty($_POST)) //檢查欄位是不是空的=長度為0的欄位
   //TODO:檢查各個欄位的資料,有沒有符合規定
   //檢查姓名欄位
   if (strlen($_POST['name']) < 1) {
-    $output['error'] = '請填寫姓名';
+    $output['error'] = '請輸入名字';
     $output['code'] = 300;
     echo json_encode($output, JSON_UNESCAPED_UNICODE);
     exit;

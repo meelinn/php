@@ -262,7 +262,7 @@ if (empty($row)) { #沒有值就直接跳回list
     </div>
 
     <!-- 新增btn -->
-    <button type="submit" class="btn btn-primary justify-content-end">新增</button>
+    <button type="submit" class="btn btn-primary justify-content-end">儲存</button>
   </form>
 </div>
 

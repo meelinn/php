@@ -5,36 +5,26 @@ require __DIR__ . '/parts/pdo-connect.php';
 # 檢查是否有提供 animal_id
 if (!isset($_GET['animal_id']) || !is_numeric($_GET['animal_id'])) {
   echo 'Invalid animal_id';
-  exit;
-}
+   exit;
+ }
 
 
 $animal_id = $_GET['animal_id'];
 
 
 # 查詢指定 animal_id 的動物資訊
-$sql = "SELECT  ai.*,
-ast.animal_state AS animal_state,
-ac.animal_color AS animal_color,
-at.animal_type AS animal_type,
-ag.animal_gender AS animal_gender,
-ab.animal_behavior AS animal_behavior,
-aib.animal_degree AS animal_degree,
-amr.animal_medical_record AS animal_medical_record,
-amr.checkup_date AS checkup_date,
-si.shelter_name AS shelter_name,
-aph.animal_photo_url AS animal_photo_url
-FROM animal_info ai
-JOIN animal_state ast ON ai.fk_animal_state_id = ast.animal_state_id
-JOIN animal_photo aph ON ai.fk_animal_photo_id = aph.animal_photo_id
-JOIN shelter_info si ON ai.fk_shelter_id = si.shelter_id
-JOIN animal_medical_record amr ON ai.fk_animal_medical_record_id = amr.animal_medical_record_id
-JOIN animal_behavior ab ON ai.fk_animal_behavior_id = ab.animal_behavior_id
-JOIN animal_type at ON ai.fk_animal_type_id = at.animal_type_id
-JOIN animal_gender ag ON ai.fk_animal_gender_id = ag.animal_gender_id
-JOIN animal_color ac ON ai.fk_animal_color = ac.animal_color_id
-JOIN animalinfo_behavior aib ON ai.animal_id = aib.fk_animal_id
-WHERE ai.animal_id = :animal_id";  // 添加 WHERE 子句以限制 animal_id
+$sql = "SELECT *
+FROM animal_info
+JOIN animal_state ON animal_info.fk_animal_state_id = animal_state.animal_state_id
+JOIN animal_photo ON animal_info.fk_animal_photo_id = animal_photo.animal_photo_id
+JOIN shelter_info ON animal_info.fk_shelter_id = shelter_info.shelter_id
+JOIN animal_medical_record ON animal_info.fk_animal_medical_record_id = animal_medical_record.animal_medical_record_id
+JOIN animal_behavior ON animal_info.fk_animal_behavior_id = animal_behavior.animal_behavior_id
+JOIN animal_type ON animal_info.fk_animal_type_id = animal_type.animal_type_id
+JOIN animal_gender ON animal_info.fk_animal_gender_id = animal_gender.animal_gender_id
+JOIN animal_color ON animal_info.fk_animal_color = animal_color.animal_color_id
+JOIN animalinfo_behavior ON animal_info.animal_id = animalinfo_behavior.fk_animal_id
+WHERE animal_info.animal_id = :animal_id";
 
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':animal_id', $animal_id, PDO::PARAM_INT);

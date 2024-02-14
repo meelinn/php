@@ -456,66 +456,78 @@ function fetchShelter($pdo, $shelter_id)
   });
 
   //Modal-編輯
-  document.addEventListener('DOMContentLoaded', function() {
-    // When the "編輯" button is clicked
-    document.querySelector('.btn-edit').addEventListener('click', function(e) {
+  function loadEditModalContent(editUrl) {
+  fetch(editUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
+    .then(data => {
+      // Update the content of the modal body with the loaded data
+      document.getElementById('editModalBody').innerHTML = data;
+
+      // Show the modal
+      new bootstrap.Modal(document.getElementById('editBackdrop')).show();
+    })
+    .catch(error => {
+      console.error('Error loading content:', error);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // When the "編輯" button is clicked
+  document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', function(e) {
       e.preventDefault();
 
       // Get the URL from the href attribute
       var editUrl = this.getAttribute('href');
 
-      // Use fetch API to load the content of edit.php
-      fetch(editUrl)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.text();
-        })
-        .then(data => {
-          // Update the content of the modal body with the loaded data
-          document.getElementById('editModalBody').innerHTML = data;
-
-          // Show the modal
-          new bootstrap.Modal(document.getElementById('editBackdrop')).show();
-        })
-        .catch(error => {
-          console.error('Error loading content:', error);
-        });
+      // Load modal content
+      loadEditModalContent(editUrl);
     });
   });
+});
 
   //Modal-資訊
-  document.addEventListener('DOMContentLoaded', function() {
-    // When the "編輯" button is clicked
-    document.querySelector('.btn-infos').addEventListener('click', function(e) {
+  function loadInfoModalContent(infoUrl) {
+  fetch(infoUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
+    .then(data => {
+      // Update the content of the modal body with the loaded data
+      document.getElementById('infoModalBody').innerHTML = data;
+
+      // Show the modal
+      new bootstrap.Modal(document.getElementById('infoBackdrop')).show();
+    })
+    .catch(error => {
+      console.error('Error loading content:', error);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // When the "查看" button is clicked
+  document.querySelectorAll('.btn-infos').forEach(btn => {
+    btn.addEventListener('click', function(e) {
       e.preventDefault();
 
       // Get the URL from the href attribute
       var infoUrl = this.getAttribute('href');
 
-      // Use fetch API to load the content of edit.php
-      fetch(infoUrl)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.text();
-        })
-        .then(data => {
-          // Update the content of the modal body with the loaded data
-          document.getElementById('infoModalBody').innerHTML = data;
-
-          // Show the modal
-          new bootstrap.Modal(document.getElementById('infoBackdrop')).show();
-        })
-        .catch(error => {
-          console.error('Error loading content:', error);
-        });
+      // Load modal content
+      loadInfoModalContent(infoUrl);
     });
   });
+});
 
-  const isEditMode = true;
+  const isEditMode = false;
 
   function sendData(event) {
     event.preventDefault(); // 不要讓表單以傳統方式送出
@@ -528,6 +540,7 @@ function fetchShelter($pdo, $shelter_id)
       gender: genderEl,
       color: colorEl,
       age: ageEl,
+      birthday: birthdayEl,
       qualities: qualitiesEl,
       narrative: narrativeEl,
       behavior: behaviorEl,
@@ -536,7 +549,7 @@ function fetchShelter($pdo, $shelter_id)
       story: storyEl
     } = document.form1;
 
-    const fields = [photoEl, nameEl, shelterEl, typeEl, genderEl, colorEl, ageEl, qualitiesEl, narrativeEl, behaviorEl, stateEl, medicalEl, storyEl];
+    const fields = [photoEl, nameEl, shelterEl, typeEl, genderEl, colorEl, ageEl, birthdayEl,qualitiesEl, narrativeEl, behaviorEl, stateEl, medicalEl, storyEl];
 
     for (let el of fields) {
       if (el) {
@@ -552,14 +565,14 @@ function fetchShelter($pdo, $shelter_id)
     // TODO: 檢查表單個欄位有沒有符合規範
 
     const checkField = (el, errorMsg) => {
-      if (el.value && el.value.trim() === '') {
-        isPass = false;
-        el.style.border = '1px solid red';
-        if (el.nextElementSibling) { // 檢查下一個兄弟元素是否存在
-          el.nextElementSibling.innerHTML = errorMsg;
-        }
-      }
-    };
+  if (!el.value || el.value.trim() === '') { // 只有当字段的值为空时才会显示错误信息
+    isPass = false;
+    el.style.border = '1px solid red';
+    if (el.nextElementSibling) { // 检查下一个兄弟元素是否存在
+      el.nextElementSibling.innerHTML = errorMsg;
+    }
+  }
+};
 
     checkField(photoEl, '請上傳圖片');
     checkField(nameEl, '請輸入名字');
@@ -574,6 +587,7 @@ function fetchShelter($pdo, $shelter_id)
     checkField(behaviorEl, '請選擇行為');
     checkField(medicalEl, '請輸入醫療史');
     checkField(storyEl, '請輸入背景故事');
+    
 
     if (isPass) {
       const fd = new FormData(document.form1);
